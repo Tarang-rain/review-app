@@ -14,7 +14,7 @@ import { spaceSchema } from "@/app/validations/spaceValidation";
 import { z } from "zod";
 import axios, { AxiosError } from "axios";
 import { toast } from "react-hot-toast";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 interface FirstTabProps {
 	questions: string[];
@@ -43,6 +43,8 @@ interface FirstTabProps {
 	profileImage: File;
 	imageUri: string | undefined;
 	setImageUri: React.Dispatch<React.SetStateAction<string | undefined>>;
+	onOpenChange: (open: boolean) => void;
+	open: boolean;
 }
 
 const colors = [
@@ -81,6 +83,8 @@ const Firsttab: React.FC<FirstTabProps> = ({
 	setProfileImage,
 	imageUri,
 	setImageUri,
+	onOpenChange,
+	open,
 }) => {
 	const [questionLength, setQuestionLength] = useState(
 		questions.map((i) => {
@@ -111,7 +115,7 @@ const Firsttab: React.FC<FirstTabProps> = ({
 			return validatedData.success;
 		} catch (error) {
 			if (error instanceof z.ZodError) {
-				console.error(error);
+				console.error(error);	
 				console.error(error);
 			}
 		}
@@ -160,7 +164,7 @@ const Firsttab: React.FC<FirstTabProps> = ({
 
 	const filterQuestion = (i: number) => {
 		setQuestions((prev) => prev.filter((_, index) => index !== i));
-		setQuestions((prev) => prev.filter((_, index) => index !== i));
+		// setQuestions((prev) => prev.filter((_, index) => index !== i));
 	};
 
 	const toggleSwitch = (item: any) => {
@@ -215,13 +219,12 @@ const Firsttab: React.FC<FirstTabProps> = ({
 					is_squareprofile: squareProfile,
 					image: base64,
 				};
-				console.log(profileImage);
 				const res = await axios.post("/api/space", responseData);
 
 				if (res.status === 200) {
 					toast.success("Space created successfully");
 					router.refresh();
-					redirect("/");
+					onOpenChange(!open);
 				}
 			} catch (error) {
 				if (axios.isAxiosError(error)) {

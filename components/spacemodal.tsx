@@ -75,6 +75,8 @@ const SpaceModal = ({ open, onOpenChange }: SpaceModalProps) => {
 					setProfileImage={setProfileImage}
 					setImageUri={setImageUri}
 					imageUri={imageUri}
+					onOpenChange={onOpenChange}
+					open={open}
 				/>
 			);
 		} else if (selectedTab === "Thank You Page") {

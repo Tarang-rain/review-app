@@ -113,7 +113,6 @@
   --sidebar-ring: oklch(0.552 0.016 285.938);
 }
 
-
 .dark {
   --background: oklch(0.141 0.005 285.823);
   --foreground: oklch(0.985 0 0);
@@ -156,7 +155,6 @@
     @apply bg-background text-foreground;
   }
 }
-
 
 ::-webkit-scrollbar {
   @apply w-2.5 h-2.5;

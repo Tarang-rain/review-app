@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Video, FileType2 } from "lucide-react";
 import { useState } from "react";
 import { TestimonialModal } from "./TestimonialModal";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 interface SpaceActionButtonsProps {
 	spaceData: any;
@@ -52,9 +54,33 @@ export function SpaceActionButtons({ spaceData }: SpaceActionButtonsProps) {
 				isOpen={isModalOpen}
 				onClose={() => setIsModalOpen(false)}
 				initialData={spaceData}
-				onSubmit={(data) => {
-					console.log(data);
-					setIsModalOpen(false);
+				onSubmit={async (data) => {
+					try {
+						const res = await axios.post("/api/testimonial", {
+							...data,
+							space_id: spaceData.space_id,
+						});
+
+						if (res.data.status === 200) {
+							toast.success("Testimonial submitted successfully");
+							setIsModalOpen(false);
+						}
+					} catch (error) {
+						if (axios.isAxiosError(error)) {
+							const axiosError = error;
+							if (axiosError.response?.status === 400) {
+								toast.error(
+									axiosError.response.data.message || "Something went wrong"
+								);
+							} else {
+								toast.error(
+									axiosError.response?.data?.message || "Something went wrong"
+								);
+							}
+						} else {
+							console.error("something went wrong", error);
+						}
+					}
 				}}
 			/>
 		</>

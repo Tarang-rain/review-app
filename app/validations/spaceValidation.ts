@@ -1,8 +1,5 @@
 import {  z } from "zod";
 
-
-
-
 const requiredField = z.object({ enabled: z.boolean(), required: z.boolean() });
 
 export const spaceSchema = z.object({

@@ -1,23 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
 	Dialog,
 	DialogContent,
-	DialogHeader,
 	DialogTitle,
+	VisuallyHidden,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Textarea } from "@/components/ui/textarea";
+import { useRouter } from "next/navigation";
 
-// Define interfaces for better type safety
 interface FormData {
-	answers: Record<string, string>[];
+	review: string;
 	rating: number;
 	name: string;
+	company: string;
 	email: string;
 	socialLink: string;
 	address: string;
@@ -47,6 +49,7 @@ interface TestimonialModalProps {
 	onClose: () => void;
 	initialData: InitialData;
 	onSubmit: (data: FormData) => void;
+	resetOnSuccess?: boolean; // New prop to control reset behavior
 }
 
 export function TestimonialModal({
@@ -54,20 +57,37 @@ export function TestimonialModal({
 	onClose,
 	initialData,
 	onSubmit,
+	resetOnSuccess = true, // Default to true
 }: TestimonialModalProps) {
-	const [formData, setFormData] = useState<FormData>({
-		answers: initialData.questions.map((question: string) => ({
-			[question]: "",
-		})),
+	const router = useRouter();
+	const createInitialFormState = (): FormData => ({
+		review: "",
 		rating: 0,
 		name: "",
 		email: "",
 		socialLink: "",
 		address: "",
-		submittedAt: "2025-03-19 11:25:14",
+		submittedAt: "",
+		company: "",
 	});
 
+	const [formData, setFormData] = useState<FormData>(createInitialFormState());
 	const [errors, setErrors] = useState<Record<string, boolean>>({});
+	const [lastSubmissionStatus, setLastSubmissionStatus] = useState<
+		number | null
+	>(null);
+
+	useEffect(() => {
+		if (isOpen) {
+			resetForm();
+		}
+	}, [isOpen]);
+
+	// Function to reset the form
+	const resetForm = () => {
+		setFormData(createInitialFormState());
+		setErrors({});
+	};
 
 	const handleInputChange = (field: string, value: string) => {
 		setFormData((prev) => ({
@@ -82,15 +102,17 @@ export function TestimonialModal({
 		}
 	};
 
-	const handleAnswerChange = (question: string, value: string) => {
+	const handleCompanyChange = (review: string, value: string) => {
 		setFormData((prev) => ({
 			...prev,
-			answers: prev.answers.map((ans) => {
-				if (Object.keys(ans)[0] === question) {
-					return { [question]: value };
-				}
-				return ans;
-			}),
+			company: value,
+		}));
+	};
+
+	const handleReviewChange = (review: string, value: string) => {
+		setFormData((prev) => ({
+			...prev,
+			review: value,
 		}));
 	};
 
@@ -109,24 +131,47 @@ export function TestimonialModal({
 			);
 		}
 
-		// Validate answers
-		formData.answers.forEach((answerObj, index) => {
-			const question = Object.keys(answerObj)[0];
-			const answer = answerObj[question];
-			if (!answer?.trim()) {
-				newErrors[`question_${index}`] = true;
-			}
-		});
-
 		if (Object.keys(newErrors).length > 0) {
 			setErrors(newErrors);
 			return;
 		}
 
-		onSubmit({
+		if (formData.review.trim() === "") {
+			setErrors((prev) => ({
+				...prev,
+				review: true,
+			}));
+			return;
+		}
+
+		if (formData.company.trim() === "") {
+			setErrors((prev) => ({
+				...prev,
+				company: true,
+			}));
+			return;
+		}
+
+		const submissionData = {
 			...formData,
-			submittedAt: "2025-03-19 11:25:14",
-		});
+			submittedAt: new Date().toISOString(),
+		};
+
+		const handleSubmission = async () => {
+			try {
+				const result = await onSubmit(submissionData);
+				if (resetOnSuccess) {
+					router.refresh();
+					resetForm();
+				}
+				return result;
+			} catch (error) {
+				console.error("Error in form submission:", error);
+				return null;
+			}
+		};
+
+		handleSubmission();
 	};
 
 	const shouldShowField = (fieldName: string): boolean => {
@@ -140,13 +185,9 @@ export function TestimonialModal({
 	return (
 		<Dialog open={isOpen} onOpenChange={onClose}>
 			<DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto scroll-smooth">
-				<DialogHeader>
+				<VisuallyHidden>
 					<DialogTitle>{initialData.header}</DialogTitle>
-					<p className="text-sm text-muted-foreground mt-2">
-						{initialData.custom_message}
-					</p>
-				</DialogHeader>
-
+				</VisuallyHidden>
 				<form onSubmit={handleSubmit} className="space-y-6">
 					<div className="flex">
 						{initialData.imageUrl && (
@@ -158,6 +199,20 @@ export function TestimonialModal({
 								}`}
 							/>
 						)}
+					</div>
+
+					<div className="space-y-2">
+						<Label>Questions</Label>
+
+						<div className="flex gap-1 flex-col">
+							{initialData?.questions.map((question, index) => {
+								return (
+									<div key={question}>
+										<p className="text-sm list-disc ">{question}</p>
+									</div>
+								);
+							})}
+						</div>
 					</div>
 					{initialData.show_ratings && (
 						<div className="space-y-2">
@@ -172,24 +227,48 @@ export function TestimonialModal({
 										}
 										className="focus:outline-none"
 									>
-										<Star
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="2"
+											strokeLinecap="round"
+											strokeLinejoin="round"
 											className={`h-6 w-6 ${
 												star <= formData.rating
 													? "fill-yellow-400 text-yellow-400"
 													: "text-gray-300"
 											}`}
-										/>
+										>
+											<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+										</svg>
 									</button>
 								))}
 							</div>
 						</div>
 					)}
+
+					<div className="space-y-2">
+						<Textarea
+							value={formData.review}
+							onChange={(e) => handleReviewChange("review", e.target.value)}
+							className={cn(
+								errors.review ? "border-red-500" : "",
+								"min-h-[7rem]"
+							)}
+						/>
+						{errors.review && (
+							<p className="text-sm text-red-500">Review is required</p>
+						)}
+					</div>
+
 					{/* Required Fields */}
 					<div className="space-y-4">
 						{shouldShowField("name") && (
 							<div className="space-y-2">
 								<Label>
-									Name{" "}
+									Your Name{" "}
 									{isFieldRequired("name") && (
 										<span className="text-red-500">*</span>
 									)}
@@ -208,7 +287,7 @@ export function TestimonialModal({
 						{shouldShowField("email") && (
 							<div className="space-y-2">
 								<Label>
-									Email{" "}
+									Your Email{" "}
 									{isFieldRequired("email") && (
 										<span className="text-red-500">*</span>
 									)}
@@ -224,6 +303,21 @@ export function TestimonialModal({
 								)}
 							</div>
 						)}
+
+						<div className="space-y-2">
+							<Label>
+								Your Title and Company <span className="text-red-500">*</span>
+							</Label>
+							<Input
+								type="text"
+								value={formData.company}
+								onChange={(e) => handleCompanyChange("company", e.target.value)}
+								className={errors.company ? "border-red-500" : ""}
+							/>
+							{errors.company && (
+								<p className="text-sm text-red-500">Title is required</p>
+							)}
+						</div>
 
 						{shouldShowField("socialLink") && (
 							<div className="space-y-2">
@@ -266,32 +360,6 @@ export function TestimonialModal({
 								)}
 							</div>
 						)}
-					</div>
-
-					{/* Questions */}
-					<div className="space-y-4">
-						{initialData.questions.map((question: string, index: number) => (
-							<div key={question} className="space-y-2">
-								<Label className="">
-									{question}
-									<span className="text-destructive ml-1">*</span>
-								</Label>
-								<Input
-									value={formData.answers[index][question]}
-									onChange={(e) => handleAnswerChange(question, e.target.value)}
-									className={cn(
-										errors[`question_${index}`] &&
-											"border-destructive focus:border-destructive"
-									)}
-									placeholder="Type your answer here"
-								/>
-								{errors[`question_${index}`] && (
-									<p className="text-sm text-destructive">
-										This answer is required
-									</p>
-								)}
-							</div>
-						))}
 					</div>
 
 					<div className="flex justify-end space-x-2 pt-4">

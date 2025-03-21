@@ -11,6 +11,7 @@ interface SpacePageParams {
 }
 
 interface SpaceData {
+	space_id: string;
 	id: string;
 	questions: string[];
 	header: string;
@@ -32,17 +33,14 @@ interface SpaceData {
 
 const Page = async ({ params }: SpacePageParams) => {
 	const { slug } = await params;
-	const session = await auth();
-	const userId = session?.user?.id;
-	const collection = db?.collection("review-collection");
+	const collection = db?.collection("space-collection");
 
 	const rawSpacesData = await collection?.findOne({
-		id: userId,
-		space_name: { $regex: new RegExp(`^${slug}$`, "i") },
+		space_id: slug,
 	});
 
-	// Serialize the MongoDB document
 	const serializedData: SpaceData = {
+		space_id: rawSpacesData?.space_id || "",
 		id: rawSpacesData?.id || "",
 		questions: rawSpacesData?.questions || [],
 		header: rawSpacesData?.header || "",
@@ -61,7 +59,7 @@ const Page = async ({ params }: SpacePageParams) => {
 		is_squareprofile: rawSpacesData?.is_squareprofile || false,
 		imageUrl: rawSpacesData?.imageUrl || "",
 	};
-
+                                                           
 	return (
 		<div
 			className={cn(
