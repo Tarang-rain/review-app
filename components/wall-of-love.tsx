@@ -1,52 +1,35 @@
+import React from "react";
+import { X, Layout, Columns, ChevronRight } from "lucide-react";
 import {
 	Dialog,
 	DialogContent,
-	DialogDescription,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { LayoutSelection } from "./layout-selection";
 
-const Wall = () => {
-	const [open, setOpen] = useState(false);
-	
+interface ModalProps {
+	isOpen: boolean;
+	onClose: () => void;
+}
+
+export const Wall = ({ isOpen, onClose }: ModalProps) => {
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger asChild>
-				<Button variant="default" size="lg" className="w-full">
-					Preview Wall of Love
-				</Button>
-			</DialogTrigger>
-			<DialogContent className="sm:max-w-xl">
+		<Dialog open={isOpen} onOpenChange={onClose} defaultOpen={true}>
+			<DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
 				<DialogHeader>
-					<DialogTitle>Wall of Love</DialogTitle>
-					<DialogDescription>
-						A showcase of your customer testimonials
-					</DialogDescription>
+					<DialogTitle className="text-xl font-semibold">
+						Choose Layout
+					</DialogTitle>
+					<button
+						onClick={onClose}
+						className="absolute top-4 right-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+					>
+						<X className="h-4 w-4" />
+					</button>
 				</DialogHeader>
-				<div className="grid grid-cols-2 gap-4 py-4">
-					<div className="bg-muted p-4 rounded-md">
-						<p className="italic">"Amazing product, saved me hours of work!"</p>
-						<p className="text-sm mt-2 font-medium">- John Doe</p>
-					</div>
-					<div className="bg-muted p-4 rounded-md">
-						<p className="italic">"Incredible service, highly recommended."</p>
-						<p className="text-sm mt-2 font-medium">- Jane Smith</p>
-					</div>
-					<div className="bg-muted p-4 rounded-md">
-						<p className="italic">"Best purchase I've made this year."</p>
-						<p className="text-sm mt-2 font-medium">- Sam Johnson</p>
-					</div>
-					<div className="bg-muted p-4 rounded-md">
-						<p className="italic">"The support team is outstanding!"</p>
-						<p className="text-sm mt-2 font-medium">- Lisa Chen</p>
-					</div>
-				</div>
+				<LayoutSelection />
 			</DialogContent>
 		</Dialog>
 	);
 };
-
-export default Wall;

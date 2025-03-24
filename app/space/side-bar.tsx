@@ -5,10 +5,12 @@ import { Inbox, Heart, Video, Text, Grid, Quote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import Wall from "@/components/wall-of-love";
 import SingleTestimonial from "@/components/single-testimonial";
+import SpaceModal from "@/components/spacemodal";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
+	isModalOpen: boolean;
+	toggleModal: () => void;
 	selectedRoute: string;
 	setSelectedRoute: React.Dispatch<React.SetStateAction<string>>;
 	widget: string;
@@ -17,6 +19,8 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function Sidebar({
 	className,
+	isModalOpen,
+	toggleModal,
 	selectedRoute,
 	setSelectedRoute,
 	widget,
@@ -45,21 +49,19 @@ export function Sidebar({
 		{
 			label: "Wall of Love",
 			icon: Grid,
-			component: <Wall />,
 		},
 		{
 			label: "Single Testimonial",
 			icon: Quote,
-			component: <SingleTestimonial />,
 		},
 	];
 
-	const renderWidgetComponent = () => {
-		const selectedWidget = widgetRoutes.find((route) => route.label === widget);
-		console.log(selectedWidget?.component);
-		return selectedWidget ? selectedWidget?.component : null;
+	const handleWidget = (label: string) => {
+		setWidget(label);
+		if (widget === "Wall of Love") {
+			toggleModal();
+		}
 	};
-
 	return (
 		<>
 			<div className={cn("pb-12", className)}>
@@ -101,7 +103,7 @@ export function Sidebar({
 											<Button
 												key={route.label}
 												variant="ghost"
-												onClick={() => setWidget(route.label)}
+												onClick={() => handleWidget(route.label)}
 												className={cn("w-full justify-start")}
 											>
 												<route.icon className="mr-2 h-4 w-4" />
@@ -113,13 +115,6 @@ export function Sidebar({
 							</div>
 						</ScrollArea>
 					</div>
-				</div>
-			</div>
-
-			<div className="flex-1 p-4 md:p-6">
-				<div className="border-t md:border-t-0 md:border-l pt-4 md:pt-0 md:pl-6">
-					<h2 className="text-xl font-bold mb-6">{widget || "Widget"}</h2>
-					<div className="w-full">{renderWidgetComponent()}</div>
 				</div>
 			</div>
 		</>

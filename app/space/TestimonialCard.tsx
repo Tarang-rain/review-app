@@ -209,5 +209,5 @@ TestimonialCardProps) => {
 		</Card>
 	);
 };
-
+	
 export default TestimonialCard;
