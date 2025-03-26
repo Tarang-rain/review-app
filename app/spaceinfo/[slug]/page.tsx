@@ -1,5 +1,4 @@
 import { db } from "@/dbConnect";
-import { auth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { SpaceActionButtons } from "../SpaceActionButtons";
@@ -59,7 +58,7 @@ const Page = async ({ params }: SpacePageParams) => {
 		is_squareprofile: rawSpacesData?.is_squareprofile || false,
 		imageUrl: rawSpacesData?.imageUrl || "",
 	};
-                                                           
+
 	return (
 		<div
 			className={cn(

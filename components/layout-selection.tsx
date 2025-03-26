@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { CodeBlock } from "./code-block";
 import { EmbedLayout } from "./embed-layout";
 
-export const LayoutSelection = () => {
+export const LayoutSelection = ({ spaceName }: { spaceName: string }) => {
 	const [selectedLayout, setSelectedLayout] = useState<string | null>(null);
 
 	const layouts = [
@@ -30,7 +30,9 @@ export const LayoutSelection = () => {
 	];
 
 	if (selectedLayout === "carousel") {
-		return <EmbedLayout layoutType={selectedLayout} />;
+		return <EmbedLayout layoutType={selectedLayout} spaceName={spaceName} />;
+	} else if (selectedLayout === "masonry") {
+		return <EmbedLayout layoutType={selectedLayout} spaceName={spaceName} />;
 	}
 
 	return (

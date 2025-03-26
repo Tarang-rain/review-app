@@ -1,6 +1,5 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { db } from "@/dbConnect";
-import TestimonialCarousel from "./TestimonialCarousel";
 import TestimonialMasonry from "./TestimonialMasonry";
 
 interface EmbedPageParams {
@@ -9,8 +8,20 @@ interface EmbedPageParams {
 	};
 }
 
-const Page = async ({ params }: EmbedPageParams) => {
-	const { space } = await params;
+const TestimonialLoadingSkeleton = () => (
+	<div className="max-w-6xl mx-auto p-4 md:p-8">
+		<div className="animate-pulse space-y-4">
+			<div className="h-8  rounded w-3/4"></div>
+			<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+				{[...Array(6)].map((_, index) => (
+					<div key={index} className=" rounded-lg h-48"></div>
+				))}
+			</div>
+		</div>
+	</div>
+);
+
+async function fetchTestimonials(space: string) {
 	const decodedSpaceName = decodeURI(space);
 
 	const spaceData = await db?.collection("space-collection").findOne({
@@ -34,7 +45,14 @@ const Page = async ({ params }: EmbedPageParams) => {
 		},
 	}));
 
-	// If no space data is found, return an error or placeholder
+	return { spaceData, serializedTestimonials };
+}
+
+const Page = async ({ params }: EmbedPageParams) => {
+	const { space } = await params;
+
+	const { spaceData, serializedTestimonials } = await fetchTestimonials(space);
+
 	if (!spaceData) {
 		return <div>Space not found</div>;
 	}
@@ -42,8 +60,9 @@ const Page = async ({ params }: EmbedPageParams) => {
 	return (
 		<div className="max-w-6xl mx-auto p-4 md:p-8">
 			<div className="mb-12">
-				{/* <TestimonialCarousel testimonials={serializedTestimonials || []} /> */}
-				<TestimonialMasonry testimonials={serializedTestimonials || []} />
+				<Suspense fallback={<TestimonialLoadingSkeleton />}>
+					<TestimonialMasonry testimonials={serializedTestimonials || []} />
+				</Suspense>
 			</div>
 		</div>
 	);

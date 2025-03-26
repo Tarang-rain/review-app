@@ -51,7 +51,10 @@ const Page = async ({ params }: SpacePageParams) => {
 
 			<div className="mt-20 flex-1">
 				<SpaceNavbar spaceName={spacename} spaceId={spaceId} />
-				<ParentLayout testimonials={serializedTestimonials} />
+				<ParentLayout
+					testimonials={serializedTestimonials}
+					spaceName={spacename}
+				/>
 			</div>
 		</div>
 	);

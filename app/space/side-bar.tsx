@@ -5,8 +5,6 @@ import { Inbox, Heart, Video, Text, Grid, Quote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import SingleTestimonial from "@/components/single-testimonial";
-import SpaceModal from "@/components/spacemodal";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 	isModalOpen: boolean;
@@ -50,10 +48,6 @@ export function Sidebar({
 			label: "Wall of Love",
 			icon: Grid,
 		},
-		{
-			label: "Single Testimonial",
-			icon: Quote,
-		},
 	];
 
 	const handleWidget = (label: string) => {
@@ -62,6 +56,7 @@ export function Sidebar({
 			toggleModal();
 		}
 	};
+
 	return (
 		<>
 			<div className={cn("pb-12", className)}>

@@ -21,3 +21,5 @@ export const spaceSchema = z.object({
   squareProfile: z.boolean(),
   imageUri: z.string().optional().nullable(),
 });
+
+export type SpaceSchemaType = z.infer<typeof spaceSchema>;

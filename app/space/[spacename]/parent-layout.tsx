@@ -1,10 +1,10 @@
 "use client";
-
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sidebar } from "../side-bar";
 import TestimonialCard from "../TestimonialCard";
 import { useEffect, useState } from "react";
 import { Wall } from "@/components/wall-of-love";
+import { Loader2 } from "lucide-react";
 
 interface TestimonialData {
 	name: string;
@@ -29,9 +29,10 @@ interface TestimonialDocument {
 
 interface ParentLayoutProps {
 	testimonials: TestimonialDocument[] | undefined;
+	spaceName: string;
 }
 
-const ParentLayout = ({ testimonials }: ParentLayoutProps) => {
+const ParentLayout = ({ testimonials, spaceName }: ParentLayoutProps) => {
 	const [selectedRoute, setSelectedRoute] = useState("All");
 	const [filteredTestimonials, setFilteredTestimonials] = useState<
 		TestimonialDocument[]
@@ -39,10 +40,16 @@ const ParentLayout = ({ testimonials }: ParentLayoutProps) => {
 	const [isEmpty, setIsEmpty] = useState<Record<string, boolean>>({});
 	const [widget, setWidget] = useState("");
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
+
 	const toggleModal = () => setIsModalOpen(!isModalOpen);
 
 	useEffect(() => {
+		setIsLoading(testimonials === undefined);
+
 		if (!testimonials) return;
+
+		setIsLoading(false);
 
 		let filtered = [...testimonials];
 
@@ -53,24 +60,32 @@ const ParentLayout = ({ testimonials }: ParentLayoutProps) => {
 				filtered = testimonials.filter(
 					(testimonial) => testimonial.testimonialData.is_liked
 				);
-				setIsEmpty((prev) => ({ ...prev, Liked: false }));
+				setIsEmpty((prev) => ({ ...prev, Liked: filtered.length === 0 }));
 				break;
 			case "Text":
 				filtered = testimonials.filter(
 					(testimonial) => testimonial.testimonialData.type === "text"
 				);
+				setIsEmpty((prev) => ({ ...prev, Text: filtered.length === 0 }));
 				break;
 			case "Video":
 				filtered = testimonials.filter(
 					(testimonial) => testimonial.testimonialData.type === "video"
 				);
-				setIsEmpty((prev) => ({ ...prev, Video: false }));
-				console.log(isEmpty);
+				setIsEmpty((prev) => ({ ...prev, Video: filtered.length === 0 }));
 				break;
 		}
 
 		setFilteredTestimonials(filtered);
 	}, [testimonials, selectedRoute]);
+
+	if (isLoading) {
+		return (
+			<div className="flex justify-center items-center h-1/2">
+				<Loader2 className="h-12 w-12 animate-spin text-primary" />
+			</div>
+		);
+	}
 
 	return (
 		<>
@@ -126,7 +141,11 @@ const ParentLayout = ({ testimonials }: ParentLayoutProps) => {
 				</div>
 			</div>
 
-			<Wall isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+			<Wall
+				isOpen={isModalOpen}
+				onClose={() => setIsModalOpen(false)}
+				spaceName={spaceName}
+			/>
 		</>
 	);
 };

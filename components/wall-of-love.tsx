@@ -11,9 +11,10 @@ import { LayoutSelection } from "./layout-selection";
 interface ModalProps {
 	isOpen: boolean;
 	onClose: () => void;
+	spaceName: string;
 }
 
-export const Wall = ({ isOpen, onClose }: ModalProps) => {
+export const Wall = ({ isOpen, onClose, spaceName }: ModalProps) => {
 	return (
 		<Dialog open={isOpen} onOpenChange={onClose} defaultOpen={true}>
 			<DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
@@ -28,7 +29,7 @@ export const Wall = ({ isOpen, onClose }: ModalProps) => {
 						<X className="h-4 w-4" />
 					</button>
 				</DialogHeader>
-				<LayoutSelection />
+				<LayoutSelection spaceName={spaceName} />
 			</DialogContent>
 		</Dialog>
 	);

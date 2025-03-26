@@ -5,25 +5,16 @@ import { gruvboxDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 interface EmbedLayoutProps {
 	layoutType: string;
+	spaceName: string;
 }
 
-export const EmbedLayout = ({ layoutType }: EmbedLayoutProps) => {
+export const EmbedLayout = ({ layoutType, spaceName }: EmbedLayoutProps) => {
 	const [copied, setCopied] = useState<string | null>(null);
 
-	const carouselCode = `<script type="text/javascript" src="https://testimonial.to/js/iframeResizer.min.js"></script>
-<iframe
-   id='testimonialto-carousel-test-101-tag-all-light'
-   src="https://localhost:3000/test-192"
-   frameborder="0"
-   scrolling="no"
-   width="100%">
-</iframe>
-<script type="text/javascript">
-  iFrameResize({
-    log: false,
-    checkOrigin: false
-  }, '#testimonialto-carousel-test-101-tag-all-light');
-</script>`;
+	const embedCode = `<script type="text/javascript" src="https://testimonial.to/js/iframeResizer.min.js"></script>
+<iframe id='testimonialto-carousel-test-101-tag-all-light' src="http://localhost:3000/${layoutType}/test-192" frameborder="0" scrolling="no" width="100%"></iframe>
+<script type="text/javascript"> iFrameResize({ log: false, checkOrigin: false }, '#testimonialto-carousel-test-101-tag-all-light'); </script>`;
+
 	const handleCopy = (text: string, id: string) => {
 		navigator.clipboard.writeText(text).then(
 			() => {
@@ -97,7 +88,7 @@ export const EmbedLayout = ({ layoutType }: EmbedLayoutProps) => {
 						<h4 className="text-sm font-medium mb-2">
 							Add the iFrame Resizer Script
 						</h4>
-						<CodeBlock code={carouselCode} id="script" />
+						<CodeBlock code={embedCode} id="script" />
 					</div>
 				</div>
 			</div>

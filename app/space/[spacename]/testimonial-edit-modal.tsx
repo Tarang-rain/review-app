@@ -14,7 +14,6 @@ import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
-import { error } from "console";
 
 interface FormData {
 	review: string;
@@ -25,6 +24,18 @@ interface FormData {
 	socialLink: string;
 	address: string;
 	submittedAt: string;
+	[key: string]: any;
+}
+
+interface ExistingFormData {
+	review?: string;
+	rating?: number;
+	name?: string;
+	company?: string;
+	email?: string;
+	socialLink?: string;
+	address?: string;
+	submittedAt?: string;
 	[key: string]: any;
 }
 
@@ -50,26 +61,28 @@ interface TestimonialModalProps {
 	onClose: () => void;
 	initialData: InitialData;
 	onSubmit: (data: FormData) => void;
+	existingTestimonialData: ExistingFormData;
 	resetOnSuccess?: boolean; // New prop to control reset behavior
 }
 
-export function TestimonialModal({
+export function TestimonialEditModal({
 	isOpen,
 	onClose,
 	initialData,
 	onSubmit,
-	resetOnSuccess = true, // Default to true
+	existingTestimonialData,
+	resetOnSuccess = true,
 }: TestimonialModalProps) {
 	const router = useRouter();
 	const createInitialFormState = (): FormData => ({
-		review: "",
-		rating: 0,
-		name: "",
-		email: "",
-		socialLink: "",
-		address: "",
-		submittedAt: "",
-		company: "",
+		review: existingTestimonialData.review!,
+		rating: existingTestimonialData.rating!,
+		name: existingTestimonialData.name!,
+		email: existingTestimonialData.email!,
+		socialLink: existingTestimonialData.socialLink!,
+		address: existingTestimonialData.address!,
+		submittedAt: existingTestimonialData.submittedAt!,
+		company: existingTestimonialData.company!,
 	});
 
 	const [formData, setFormData] = useState<FormData>(createInitialFormState());
