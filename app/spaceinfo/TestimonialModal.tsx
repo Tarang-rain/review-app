@@ -14,7 +14,6 @@ import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
-import { error } from "console";
 
 interface FormData {
 	review: string;
@@ -58,7 +57,7 @@ export function TestimonialModal({
 	onClose,
 	initialData,
 	onSubmit,
-	resetOnSuccess = true, // Default to true
+	resetOnSuccess = true,
 }: TestimonialModalProps) {
 	const router = useRouter();
 	const createInitialFormState = (): FormData => ({
@@ -127,6 +126,10 @@ export function TestimonialModal({
 
 		if (formData.company.trim() === "") {
 			newErrors.company = true;
+		}
+
+		if (formData.rating <= 0) {
+			newErrors.rating = true;
 		}
 
 		if (initialData.required_fields) {
@@ -241,6 +244,9 @@ export function TestimonialModal({
 									</button>
 								))}
 							</div>
+							{errors.rating && (
+								<p className="text-sm text-red-500">Rating is required</p>
+							)}
 						</div>
 					)}
 

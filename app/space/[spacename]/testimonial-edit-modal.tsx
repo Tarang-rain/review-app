@@ -24,19 +24,6 @@ interface FormData {
 	socialLink: string;
 	address: string;
 	submittedAt: string;
-	[key: string]: any;
-}
-
-interface ExistingFormData {
-	review?: string;
-	rating?: number;
-	name?: string;
-	company?: string;
-	email?: string;
-	socialLink?: string;
-	address?: string;
-	submittedAt?: string;
-	[key: string]: any;
 }
 
 interface RequiredField {
@@ -44,7 +31,20 @@ interface RequiredField {
 	required: boolean;
 }
 
+interface TestimonialData {
+	review: string;
+	rating: number;
+	name: string;
+	company: string;
+	email: string;
+	socialLink: string;
+	address: string;
+	submittedAt: string;
+	[key: string]: any;
+}
+
 interface InitialData {
+	space_id: string;
 	questions: string[];
 	required_fields: {
 		[key: string]: RequiredField;
@@ -59,30 +59,30 @@ interface InitialData {
 interface TestimonialModalProps {
 	isOpen: boolean;
 	onClose: () => void;
-	initialData: InitialData;
+	testimonialData: TestimonialData;
 	onSubmit: (data: FormData) => void;
-	existingTestimonialData: ExistingFormData;
-	resetOnSuccess?: boolean; // New prop to control reset behavior
+	initialData: InitialData;
+	resetOnSuccess?: boolean;
 }
 
 export function TestimonialEditModal({
 	isOpen,
 	onClose,
-	initialData,
+	testimonialData,
 	onSubmit,
-	existingTestimonialData,
+	initialData,
 	resetOnSuccess = true,
 }: TestimonialModalProps) {
 	const router = useRouter();
 	const createInitialFormState = (): FormData => ({
-		review: existingTestimonialData.review!,
-		rating: existingTestimonialData.rating!,
-		name: existingTestimonialData.name!,
-		email: existingTestimonialData.email!,
-		socialLink: existingTestimonialData.socialLink!,
-		address: existingTestimonialData.address!,
-		submittedAt: existingTestimonialData.submittedAt!,
-		company: existingTestimonialData.company!,
+		review: testimonialData.review,
+		rating: testimonialData.rating,
+		name: testimonialData.name,
+		email: testimonialData.email,
+		socialLink: testimonialData.socialLink,
+		address: testimonialData.address,
+		submittedAt: testimonialData.submittedAt,
+		company: testimonialData.company,
 	});
 
 	const [formData, setFormData] = useState<FormData>(createInitialFormState());
@@ -142,6 +142,11 @@ export function TestimonialEditModal({
 			newErrors.company = true;
 		}
 
+		if (Object.keys(newErrors).length > 0) {
+			setErrors(newErrors);
+			return;
+		}
+
 		if (initialData.required_fields) {
 			Object.entries(initialData.required_fields).forEach(
 				([field, value]: [string, RequiredField]) => {
@@ -151,13 +156,8 @@ export function TestimonialEditModal({
 				}
 			);
 		}
-
-		if (Object.keys(newErrors).length > 0) {
-			setErrors(newErrors);
-			return;
-		}
-
 		const submissionData = {
+			space_id: initialData.space_id,
 			...formData,
 			submittedAt: new Date().toISOString(),
 		};
@@ -185,10 +185,6 @@ export function TestimonialEditModal({
 	const isFieldRequired = (fieldName: string): boolean => {
 		return Boolean(initialData.required_fields?.[fieldName]?.required);
 	};
-
-	useEffect(() => {
-		console.log("errors", errors);
-	}, [errors]);
 
 	return (
 		<Dialog open={isOpen} onOpenChange={onClose}>

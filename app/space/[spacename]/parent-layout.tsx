@@ -17,10 +17,27 @@ interface TestimonialData {
 	company?: string;
 	answers?: Array<Record<string, string>>;
 	space_id?: string;
-	submittedAt?: string;
+	submittedAt: string;
 	is_liked?: boolean;
 	testimonial_id: string;
 	type: string;
+}
+
+interface RequiredField {
+	enabled: boolean;
+	required: boolean;
+}
+
+interface SpaceData {
+	questions: string[];
+	required_fields: {
+		[key: string]: RequiredField;
+	};
+	header: string;
+	custom_message: string;
+	imageUrl?: string;
+	is_squareprofile?: boolean;
+	show_ratings?: boolean;
 }
 
 interface TestimonialDocument {
@@ -29,10 +46,15 @@ interface TestimonialDocument {
 
 interface ParentLayoutProps {
 	testimonials: TestimonialDocument[] | undefined;
+	spaceData: SpaceData;
 	spaceName: string;
 }
 
-const ParentLayout = ({ testimonials, spaceName }: ParentLayoutProps) => {
+const ParentLayout = ({
+	testimonials,
+	spaceData,
+	spaceName,
+}: ParentLayoutProps) => {
 	const [selectedRoute, setSelectedRoute] = useState("All");
 	const [filteredTestimonials, setFilteredTestimonials] = useState<
 		TestimonialDocument[]
@@ -124,7 +146,9 @@ const ParentLayout = ({ testimonials, spaceName }: ParentLayoutProps) => {
 											createdAt: testimonial.testimonialData.createdAt,
 											company: testimonial.testimonialData.company,
 											is_liked: testimonial.testimonialData.is_liked,
+											submitted_at: testimonial.testimonialData.submittedAt,
 										}}
+										spaceData={spaceData}
 									/>
 								))}
 							</div>

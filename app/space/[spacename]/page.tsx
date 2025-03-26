@@ -3,6 +3,7 @@ import SpaceNavbar from "../SpaceNavbar";
 import { db } from "@/dbConnect";
 import { auth } from "@/lib/auth";
 import ParentLayout from "./parent-layout";
+import { serializeDocument } from "@/lib/helper";
 
 interface SpacePageParams {
 	params: {
@@ -45,6 +46,8 @@ const Page = async ({ params }: SpacePageParams) => {
 		},
 	}));
 
+	const serializeSpaceData = serializeDocument(spaceData);
+
 	return (
 		<div className="min-h-screen flex flex-col">
 			<Navbar />
@@ -54,6 +57,7 @@ const Page = async ({ params }: SpacePageParams) => {
 				<ParentLayout
 					testimonials={serializedTestimonials}
 					spaceName={spacename}
+					spaceData={serializeSpaceData}
 				/>
 			</div>
 		</div>
